@@ -1,0 +1,12 @@
+gensim
+numpy
+scipy
+fastapi
+uvicorn
+pandas
+umap-learn
+jupyter
+tqdm
+zstandard
+requests
+datasets
