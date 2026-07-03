@@ -10,3 +10,5 @@ tqdm
 zstandard
 requests
 datasets
+nltk
+matplotlib

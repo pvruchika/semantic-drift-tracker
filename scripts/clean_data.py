@@ -3,20 +3,23 @@
 import os
 import re
 
-YEARS = range(2015, 2021)
+YEARS = range(2015, 2024)
 RAW_DIR = "data/raw"
 PROCESSED_DIR = "data/processed"
 MIN_TOKENS = 5
 
 URL_RE = re.compile(r"https?://\S+|www\.\S+")
+APOSTROPHE_RE = re.compile(r"'")
 NON_ALPHA_RE = re.compile(r"[^a-z\s]")
 
 
 def clean_line(line):
     line = line.lower()
     line = URL_RE.sub(" ", line)
+    line = APOSTROPHE_RE.sub("", line)
     line = NON_ALPHA_RE.sub(" ", line)
-    return line.split()
+    tokens = line.split()
+    return [t for t in tokens if len(t) > 1]
 
 
 def process_year(year):

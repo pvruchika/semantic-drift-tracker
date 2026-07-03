@@ -9,7 +9,7 @@ import time
 import requests
 
 API_URL = "https://arctic-shift.photon-reddit.com/api/comments/search"
-YEARS = [2015, 2016, 2017, 2018, 2019, 2020]
+YEARS = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023]
 RAW_DIR = "data/raw"
 PAGE_LIMIT = 100
 TARGET_PER_YEAR = 300_000
@@ -41,11 +41,23 @@ def fetch_page(after_ts, before_ts):
             return None
 
 
+def count_lines(path):
+    if not os.path.exists(path):
+        return 0
+    with open(path, "r", encoding="utf-8") as f:
+        return sum(1 for _ in f)
+
+
 def download_year(year):
+    out_path = os.path.join(RAW_DIR, f"comments_{year}.txt")
+    existing = count_lines(out_path)
+    if existing >= TARGET_PER_YEAR:
+        print(f"Skipping {year}: already complete ({existing:,} comments) -> {out_path}")
+        return existing
+
     after_ts = calendar.timegm(datetime.date(year, 1, 1).timetuple())
     before_ts = calendar.timegm(datetime.date(year + 1, 1, 1).timetuple())
 
-    out_path = os.path.join(RAW_DIR, f"comments_{year}.txt")
     collected = 0
 
     with open(out_path, "w", encoding="utf-8") as out_f:
