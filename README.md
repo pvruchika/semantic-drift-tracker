@@ -80,55 +80,42 @@ or labeled data:
 ```
 semantic-drift-tracker/
 ├── scripts/
-│   ├── download_data.py       # Fetch 300k comments/year from Arctic Shift API
-│   ├── clean_data.py          # Tokenize and normalize raw comments
-│   ├── train_embeddings.py    # Train per-year Word2Vec models
-│   ├── align_embeddings.py    # Procrustes alignment to 2015 reference space
-│   └── compute_drift.py       # Cosine distance + neighbor computation
+│   ├── download_data.py      # Arctic Shift API streaming pipeline
+│   ├── clean_data.py         # Text normalization and tokenization
+│   ├── train_embeddings.py   # Per-year Word2Vec training
+│   ├── align_embeddings.py   # Procrustes alignment to 2015 anchor
+│   └── compute_drift.py      # Drift scores and neighbor extraction
 ├── app/
-│   ├── backend/
-│   │   ├── main.py            # FastAPI: /word, /top-drift, /search, /health
-│   │   └── run.py             # uvicorn entrypoint
-│   └── frontend/
-│       └── src/
-│           ├── App.jsx        # Main UI: search, drift chart, neighbor table
-│           └── api.js         # Fetch helpers (reads VITE_API_URL env var)
+│   ├── backend/              # FastAPI server
+│   └── frontend/             # React + Vite app
 ├── notebooks/
-│   └── explore_drift.ipynb    # Interactive drift analysis
-├── data/
-│   ├── drift_results.json     # Per-word drift scores + neighbors (Git LFS)
-│   └── top_drifted_words.json # Filtered top-200 most drifted words (Git LFS)
-├── requirements.txt
-├── runtime.txt                # Python 3.11.9 (Render)
-└── .python-version            # Python 3.11.9 (pyenv)
+│   └── explore_drift.ipynb   # EDA and finding discovery
+└── data/
+    └── drift_results.json    # Precomputed drift data (Git LFS)
 ```
 
 ---
 
-## Reproducing the pipeline
+## Reproducing the results
 
 ```bash
-# 1. Create virtualenv (venv placed outside repo to avoid MAX_PATH issues on Windows)
-VENV_DIR=/c/venvs/sdt bash setup.sh
-
-# 2. Activate
-source /c/venvs/sdt/Scripts/activate   # Windows
-# source /c/venvs/sdt/bin/activate     # macOS/Linux
-
-# 3. Run pipeline in order
-python scripts/download_data.py    # ~4–6 hours, skips completed years
+git clone https://github.com/YOUR_USERNAME/semantic-drift-tracker
+cd semantic-drift-tracker
+bash setup.sh
+python scripts/download_data.py   # ~2 hours
 python scripts/clean_data.py
-python scripts/train_embeddings.py # ~20–40 min depending on hardware
+python scripts/train_embeddings.py
 python scripts/align_embeddings.py
 python scripts/compute_drift.py
-
-# 4. Start API
-python app/backend/run.py
-
-# 5. Start frontend
-cd app/frontend && npm install && npm run dev
 ```
 
-> **Note:** `data/raw/`, `data/processed/`, and `models/` are gitignored —
-> run the pipeline locally to regenerate them.
-> `data/drift_results.json` is stored via Git LFS and pulled automatically on clone.
+---
+
+## Limitations and future work
+
+- Corpus limited to Reddit — findings reflect Reddit's demographic
+  and cultural biases, not general language change
+- Word2Vec captures distributional similarity but not word sense
+  disambiguation — polysemous words may show artificial drift
+- Future: extend to contextual embeddings (BERT) for sense-level
+  drift detection; expand corpus to cover more domains
