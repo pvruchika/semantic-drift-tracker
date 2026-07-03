@@ -17,8 +17,6 @@ env/
 # Project data and models
 data/raw/
 data/processed/
-data/drift_results.json
-data/top_drifted_words.json
 data/top_drifted_words_unfiltered.json
 models/
 
