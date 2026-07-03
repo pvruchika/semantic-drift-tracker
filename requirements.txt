@@ -1,5 +1,5 @@
-gensim
-numpy
+gensim==4.3.2
+numpy>=1.23,<2.0
 scipy
 fastapi
 uvicorn
